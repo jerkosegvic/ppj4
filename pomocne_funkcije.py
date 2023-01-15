@@ -195,14 +195,15 @@ def dodaj_lokalnu_funkciju(cvor, ime, tip, definirana, parametri):
 def dodaj_argumente(cvor, argumenti):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
+    ADR = 4 * len(argumenti)
     for arg in argumenti:
         if arg[0].startswith('niz'):
             #print(arg[0])
             novo = arg[0][4 : len(arg[0]) - 1]
             blok_cvor.dodaj_lokalni_niz(arg[1], novo, -1)
         else:
-            blok_cvor.dodaj_lokalnu_varijablu(arg[1], arg[0])
-
+            blok_cvor.dodaj_lokalnu_varijablu(arg[1], arg[0], None, ADR)
+        ADR -= 4
 def provjeri_identifikator_lokalno(cvor, ime):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
@@ -358,3 +359,7 @@ def provjeri_definicije():
             print('funkcija')
             exit(0)
 
+def getaj_adresu(cvor, ime):
+    id_bloka = GS.Cvor.tablice[cvor.id]
+    blok_cvor = PS.Cvor.cvorovi[id_bloka]
+    return blok_cvor.get_adresa(ime)

@@ -21,6 +21,23 @@ class Cvor:
         Cvor.cid += 1
         Cvor.cvorovi.append(self)
 
+    def get_sp(self):
+        min = 0
+        if self.parent == None:
+            return None
+
+        for i in self.tablica_lokalnih_varijabli.keys():
+            if self.tablica_lokalnih_varijabli[i].adresa < min:
+                min = self.tablica_lokalnih_varijabli[i].adresa
+        
+        for i in self.nasljedna_tablica_varijabli.keys():
+            if self.nasljedena_tablica_varijabli[i].adresa == None:
+                continue
+            if self.nasljedena_tablica_varijabli[i].adresa < min:
+                min = self.nasljedena_tablica_varijabli[i].adresa
+        
+        return min
+
     def add_child(self, child):
         self.children.append(child)
     
@@ -32,6 +49,13 @@ class Cvor:
         else:
             return self.parent.go_up(n-1)
     
+    def get_adresa(self, ime):
+        if ime in self.tablica_lokalnih_varijabli.keys():
+            return self.tablica_lokalnih_varijabli[ime].adresa
+        if ime in self.nasljedena_tablica_varijabli.keys():
+            return self.nasljedena_tablica_varijabli[ime].adresa
+        return None
+
     def __str__(self):
         if self.parent == None:
             return self.dubina*" " + self.value + ", tip je " + str(self.tip) + ", vraca " + str(self.return_tip) +  ", ID: " + str(self.id) + ", parent: None"    
@@ -54,18 +78,26 @@ class Cvor:
             nas = copy.deepcopy(self.parent.nasljedena_tablica_funkcija)
             nas.update(self.parent.tablica_lokalnih_funkcija)
             self.nasljedena_tablica_funkcija = nas
-    def dodaj_lokalnu_varijablu(self, ime, tip, value = None):
+    def dodaj_lokalnu_varijablu(self, ime, tip, value = None, ADR = None):
         if ime in self.tablica_lokalnih_varijabli.keys():
             return False
         else:
-            self.tablica_lokalnih_varijabli[ime] = dek.varijabla(ime, tip, value)
+            if ADR == None:
+                ADR = self.get_sp()
+                if ADR != None:
+                    ADR -=4
+            self.tablica_lokalnih_varijabli[ime] = dek.varijabla(ime, tip, value, ADR)
             return True
 
-    def dodaj_lokalni_niz(self, ime, tip, duljina, values = []):
+    def dodaj_lokalni_niz(self, ime, tip, duljina, values = [], ADR = None):
         if ime in self.tablica_lokalnih_varijabli.keys():
             return False
         else:
-            self.tablica_lokalnih_varijabli[ime] = dek.niz(ime, tip, duljina, values)
+            if ADR == None:
+                ADR = self.get_sp()
+                if ADR != None:
+                    ADR -=4
+            self.tablica_lokalnih_varijabli[ime] = dek.niz(ime, tip, duljina, values, ADR)
             return True
 
     def dodaj_lokalnu_funkciju_void(self, ime, tip, definirana):

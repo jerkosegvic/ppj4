@@ -1,3 +1,6 @@
-	hello
-world
-!
+    MOVE 40000, R7
+    CALL F_MAIN
+    HALT
+
+
+F_main MOVE R7 R0

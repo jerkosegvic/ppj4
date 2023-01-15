@@ -3,6 +3,7 @@ import zavrsni_klase as ZK
 import pomocne_funkcije as pomocne
 import ProgramskoStablo as PS
 import copy
+import pisac as PK
 
 #IZRAZI
 class primarni_izraz(GS.Cvor):
@@ -90,7 +91,12 @@ class postfiks_izraz(GS.Cvor):
             return None
         return trenutni
 
+    def dohvati_ref_adresu(self):
+        idn = self.dohvati_idn()
+        odmak = pomocne.getaj_adresu(self, idn)
+        #if len(self.children) == 1:
 
+            
     def izvedi_svojstva(self):
         if len(self.children) == 1:
             child = self.children[0]
@@ -828,6 +834,8 @@ class izraz_pridruzivanja(GS.Cvor):
                 self.tip = c1.tip
         
                 self.lizraz = 0
+
+                
             else:
                 pomocne.izlaz(self)
         else:
@@ -1150,6 +1158,8 @@ class naredba_skoka(GS.Cvor):
 
                 if not uvjet:
                     pomocne.izlaz(self)
+                PK.upisi("\n    MOVE R0, R7")
+                PK.upisi("\n    RET")
 
             else:
                 pomocne.izlaz(self)
@@ -1163,10 +1173,13 @@ class naredba_skoka(GS.Cvor):
                 c2.izvedi_svojstva()
                 pov = pomocne.tip_funkcije(self, c2.tip) 
                 #print(c2.children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].tip)
-
+            
                 if not pov or c2.oblik == 'funkcija' or c2.oblik == 'niz':
                     pomocne.izlaz(self)
-
+                PK.upisi("\n    POP R1")
+                PK.upisi("\n    MOVE R1, R6")
+                PK.upisi("\n    MOVE R0, R7")
+                PK.upisi("\n    RET")    
             else:
                 pomocne.izlaz(self)
         else:
@@ -1250,7 +1263,7 @@ class definicija_funkcije(GS.Cvor):
                 if uvjet:
                     pomocne.izlaz(self)
 
-                pisac.zapisi("\nF_" + c2.ime + )
+                PK.upisi("\nF_" + c2.ime + " MOVE R7 R0")
 
                 #4. provjerit postoji li deklaracije funkcije
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
@@ -1281,6 +1294,7 @@ class definicija_funkcije(GS.Cvor):
                 if uvjet:
                     pomocne.izlaz(self)
 
+                PK.upisi("\nF_" + c2.ime + " MOVE R7 R0")
                 c4.izvedi_svojstva()
 
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
