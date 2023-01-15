@@ -1244,11 +1244,13 @@ class definicija_funkcije(GS.Cvor):
 
                 if c1.tip.startswith('const'):
                     pomocne.izlaz(self)
-                
+                                
                 uvjet = pomocne.provjeri_definiciju(self, c2.ime)
                 
                 if uvjet:
                     pomocne.izlaz(self)
+
+                pisac.zapisi("\nF_" + c2.ime + )
 
                 #4. provjerit postoji li deklaracije funkcije
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
