@@ -110,6 +110,18 @@ IZLAZ_F_MUL
     MOVE 1, R3
     ADD R3, R2, R2
 OUT_F_MUL STORE R2, (R7+8)
+    RET
+    
+F_INC LOAD R6, (R7+4)
+    MOVE 1, R5
+    ADD R6, R5, R6
+    STORE R6, (R7+4)
+    RET
+    
+F_DEC LOAD R6, (R7+4)
+    MOVE 1, R5
+    SUB R6, R5, R6
+    STORE R6, (R7+4)
     RET'''
 
 
