@@ -28,11 +28,15 @@ class primarni_izraz(GS.Cvor):
                 self.tip = 'int'
                 self.lizraz = 0
                 child.izvedi_svojstva()
+                PK.upisi("    MOVE %D " + str(child.vrijednost) + ", R1")
+                PK.upisi("    PUSH R1")
 
             elif isinstance(child, ZK.ZNAK):
                 #child.izvedi_svojstva()
                 self.tip = 'char'
                 self.lizraz = 0
+                PK.upisi("    MOVE %D" + str(ord(child.znak)) + ", R1")
+                PK.upisi("    PUSH R1")
             
             elif isinstance(child, ZK.NIZ_ZNAKOVA):
                 child.izvedi_svojstva()
@@ -65,6 +69,7 @@ class postfiks_izraz(GS.Cvor):
         GS.Cvor.__init__(self, value, dubina, parent)
         self.tip = None
         self.lizraz = None
+        self.lijevi = False
         
 
     def dohvati_idn2(self):
@@ -93,7 +98,7 @@ class postfiks_izraz(GS.Cvor):
 
     def dohvati_ref_adresu(self):
         idn = self.dohvati_idn()
-        odmak = pomocne.getaj_adresu(self, idn)
+        odmak = pomocne.getaj_adresu(self, idn.ime)
         #if len(self.children) == 1:
 
             
@@ -113,8 +118,15 @@ class postfiks_izraz(GS.Cvor):
                     #print("za cvor ", self, "dohvacen idn ", dhv.ime)
                     self.oblik = pomocne.nadi_oblik(self, dhv)
                     
-                    
-
+            if not self.lijevi and self.oblik == 'var':
+                adresa = self.dohvati_ref_adresu()
+                if adresa == None:
+                    PK.upisi("    LOAD R1, (VAR_" + str((self.dohvati_idn()).ime) +")")
+                elif adresa < 0:
+                    PK.upisi("    LOAD R1, (R7" + str(adresa) + ")")
+                else:
+                    PK.upisi("    LOAD R1, (R7+" + str(adresa) + ")")
+                PK.upisi("    PUSH R1")
         elif len(self.children) == 4: 
             c1 = self.children[0]
             c2 = self.children[1]
@@ -153,9 +165,13 @@ class postfiks_izraz(GS.Cvor):
                     dhv = c1.dohvati_idn()
                     if not pomocne.provjeri_egzistenciju(self, dhv.ime):
                         pomocne.izlaz(self)
-
+                PK.upisi("    PUSH R0")
                 c3.izvedi_svojstva()
-
+                PK.upisi("    CALL F_" + c1.dohvati_idn().ime)
+                for i in range(c3.broj_argumenata()):
+                    PK.upisi("    POP R1")    
+                PK.upisi("    POP R0")
+                PK.upisi("    PUSH R6")
                 #parametri = c1.parm_tip
                 argumetni = c3.tipovi
 
@@ -192,6 +208,11 @@ class postfiks_izraz(GS.Cvor):
 
                 if not uvjet:
                     pomocne.izlaz(self)
+
+                PK.upisi("    PUSH R0")
+                PK.upisi("    CALL F_" + c1.dohvati_idn().ime)
+                PK.upisi("    POP R1")
+                PK.upisi("    PUSH R6")
             else:
                 pomocne.izlaz(self)
         
@@ -213,7 +234,7 @@ class postfiks_izraz(GS.Cvor):
         else:
             pomocne.izlaz(self)
 
-
+    
                     
 
 
@@ -221,6 +242,9 @@ class lista_argumenata(GS.Cvor):
     def __init__(self, value, dubina = 0, parent = None):
         GS.Cvor.__init__(self, value, dubina, parent)
         self.tipovi = []
+    
+    def broj_argumenata(self):
+        return len(self.tipovi)
 
     def izvedi_svojstva(self):
         if len(self.children) == 1:
@@ -268,6 +292,7 @@ class unarni_izraz(GS.Cvor):
                 self.tip = c1.tip
                 self.lizraz = c1.lizraz
                 self.oblik = c1.oblik
+                
             else:
                 pomocne.izlaz(self)
         
@@ -299,7 +324,7 @@ class unarni_izraz(GS.Cvor):
         else:
             pomocne.izlaz(self)
 
-
+    
 class unarni_operator(GS.Cvor):
     def __init__(self, value, dubina = 0, parent = None):
         GS.Cvor.__init__(self, value, dubina, parent)
@@ -819,6 +844,7 @@ class izraz_pridruzivanja(GS.Cvor):
             c3 = self.children[2]
 
             if isinstance(c1, postfiks_izraz) and isinstance(c2, ZK.OP_PRIDRUZI) and isinstance(c3, izraz_pridruzivanja):
+                c1.lijevi = True
                 c1.izvedi_svojstva()
                 c3.izvedi_svojstva()
 
@@ -1158,8 +1184,8 @@ class naredba_skoka(GS.Cvor):
 
                 if not uvjet:
                     pomocne.izlaz(self)
-                PK.upisi("\n    MOVE R0, R7")
-                PK.upisi("\n    RET")
+                PK.upisi("    MOVE R0, R7")
+                PK.upisi("    RET\n")
 
             else:
                 pomocne.izlaz(self)
@@ -1176,10 +1202,10 @@ class naredba_skoka(GS.Cvor):
             
                 if not pov or c2.oblik == 'funkcija' or c2.oblik == 'niz':
                     pomocne.izlaz(self)
-                PK.upisi("\n    POP R1")
-                PK.upisi("\n    MOVE R1, R6")
-                PK.upisi("\n    MOVE R0, R7")
-                PK.upisi("\n    RET")    
+                PK.upisi("    POP R1")
+                PK.upisi("    MOVE R1, R6")
+                PK.upisi("    MOVE R0, R7")
+                PK.upisi("    RET\n")    
             else:
                 pomocne.izlaz(self)
         else:
@@ -1263,7 +1289,7 @@ class definicija_funkcije(GS.Cvor):
                 if uvjet:
                     pomocne.izlaz(self)
 
-                PK.upisi("\nF_" + c2.ime + " MOVE R7 R0")
+                PK.upisi("F_" + c2.ime + " MOVE R7, R0")
 
                 #4. provjerit postoji li deklaracije funkcije
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
@@ -1294,7 +1320,7 @@ class definicija_funkcije(GS.Cvor):
                 if uvjet:
                     pomocne.izlaz(self)
 
-                PK.upisi("\nF_" + c2.ime + " MOVE R7 R0")
+                PK.upisi("F_" + c2.ime + " MOVE R7 R0")
                 c4.izvedi_svojstva()
 
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
@@ -1529,7 +1555,7 @@ class init_deklarator(GS.Cvor):
             if isinstance(c1, izravni_deklarator) and isinstance(c2, ZK.OP_PRIDRUZI) and isinstance(c3, inicijalizator):
 
                 c1.ntip = self.ntip
-                c1.izvedi_svojstva()
+                c1.izvedi_svojstva_s_inicijalizacijom()
 
                 c3.izvedi_svojstva()
 
@@ -1563,6 +1589,13 @@ class init_deklarator(GS.Cvor):
                 #print(c3.oblik)
                 if c3.oblik == 'funkcija':
                     pomocne.izlaz(self)
+                ##VAMO PISI
+                if c1.oblik == 'var':
+                    ##TODO: POPRAVI OVO
+                    pomocne.dodaj_lokalnu_varijablu(self, c1.children[0].ime, c1.children[0].tip) 
+                elif c1.oblik == 'niz':
+                    ##TODO: POPRAVI OVO
+                    pomocne.dodaj_lokalni_niz(self, c1.children[0].ime, c1.children[0].tip, int(c1.children[2].vrijednost))
             else:
                 pomocne.izlaz(self)
         else:
@@ -1626,6 +1659,102 @@ class izravni_deklarator(GS.Cvor):
                     pomocne.izlaz(self)
 
                 pomocne.dodaj_lokalni_niz(self, c1.ime, self.ntip, int(c3.vrijednost))
+                self.oblik = 'niz'
+                self.broj_elemenata = int(c3.vrijednost)
+
+                #zabilježi deklaraciju i tip!!!!!!!!!!!!!!!!!!!!
+
+            elif isinstance(c1, ZK.IDN) and isinstance(c2, ZK.L_ZAGRADA) and \
+                isinstance(c3, ZK.KR_VOID) and isinstance(c4, ZK.D_ZAGRADA):
+
+                uvjet = pomocne.provjeri_deklaraciju_i_tipove(self, c1.ime, self.ntip)
+
+                if uvjet == False:
+                    pomocne.izlaz(self)
+
+                if uvjet == None:
+                    pomocne.dodaj_lokalnu_funkciju_void(self, c1.ime, self.ntip, False)
+
+                self.je_funkcija = True
+                self.pov = self.ntip
+                self.parametri = 'void'
+                self.tip = 'funkcija'
+                # postavi tip za funkciju sta vraca void
+                #ovu bas ne kuzim
+
+                
+            
+            elif isinstance(c1, ZK.IDN) and isinstance(c2, ZK.L_ZAGRADA) and \
+                isinstance(c3, lista_parametara) and isinstance(c4, ZK.D_ZAGRADA):
+
+                c3.izvedi_svojstva()
+
+                uvjet = pomocne.provjeri_deklaraciju_i_tipove(self, c1.ime, self.ntip, c3.tipovi)
+
+                if uvjet == False:
+                    pomocne.izlaz(self)
+
+                if uvjet == None:
+                    tipovi_tuplovi = list(zip(c3.tipovi, c3.imena))
+                    pomocne.dodaj_lokalnu_funkciju(self, c1.ime, self.ntip, False, tipovi_tuplovi)
+
+                else:
+                    pomocne.izlaz(self)
+
+                self.je_funkcija = True
+                self.pov = self.ntip
+                self.parametri = c3.tipovi
+                self.tip = 'funkcija'
+            else:
+                pomocne.izlaz(self)
+    def izvedi_svojstva_s_inicijalizacijom(self):
+        
+        if len(self.children) == 1:
+
+            c1 = self.children[0]
+
+            if isinstance(c1, ZK.IDN):
+
+                self.tip = self.ntip
+                
+                if self.ntip == 'void':
+                    pomocne.izlaz(self)
+
+                uvjet = pomocne.provjeri_identifikator_lokalno(self, c1.ime)
+                c1.tip = self.ntip
+                if uvjet:
+                    pomocne.izlaz(self)
+                ##TODO: NAPISI OVO GORE!!!
+                #pomocne.dodaj_argumente(self, [(c1.tip, c1.ime)])
+                self.oblik = 'var'
+                #provjeri ime bla bla bla
+            else:
+                pomocne.izlaz(self)
+            
+        elif len(self.children) == 4:
+
+            c1 = self.children[0]
+            c2 = self.children[1]
+            c3 = self.children[2]
+            c4 = self.children[3]
+
+            if isinstance(c1, ZK.IDN) and isinstance(c2, ZK.L_UGL_ZAGRADA) and \
+                isinstance(c3, ZK.BROJ) and isinstance(c4, ZK.D_UGL_ZAGRADA):
+
+                if self.ntip == 'void':
+                    pomocne.izlaz(self)
+
+                self.tip = 'niz(' + self.ntip + ')'
+
+                uvjet = pomocne.provjeri_identifikator_lokalno(self, c1.ime)
+
+                if uvjet:
+                    pomocne.izlaz(self)
+
+                if int(c3.vrijednost) <= 0 or int(c3.vrijednost) > 1024:
+                    pomocne.izlaz(self)
+                ##TODO: NAPISI OVO GORE!!!
+                #pomocne.dodaj_lokalni_niz(self, c1.ime, self.ntip, int(c3.vrijednost))
                 self.oblik = 'niz'
                 self.broj_elemenata = int(c3.vrijednost)
 
@@ -1739,7 +1868,7 @@ class lista_izraza_pridruzivanja(GS.Cvor):
                 c1.izvedi_svojstva()
                 self.tipovi = [c1.tip]
                 self.broj_elemenata = 1
-
+            ##TODO PUSHAJ TAJ SUGAVI IZRAZ NA STOG ILI SE POBRINI DA BUDE PSUHANO
             else:
                 pomocne.izlaz(self)
         elif len(self.children) == 3:
@@ -1757,6 +1886,7 @@ class lista_izraza_pridruzivanja(GS.Cvor):
                 self.broj_elemenata = c1.broj_elemenata + 1
                 self.tipovi = copy.deepcopy(c1.tipovi)
                 self.tipovi.append(c3.tip)
+            ##TODO PUSHAJ TAJ SUGAVI IZRAZ NA STOG ILI SE POBRINI DA BUDE PSUHANO
             else:
                 pomocne.izlaz(self)
 

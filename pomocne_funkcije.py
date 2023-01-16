@@ -279,15 +279,15 @@ def updateaj_blok(cvor):
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
     blok_cvor.update_tablice()
 
-def dodaj_lokalnu_varijablu(cvor, ime, tip):
+def dodaj_lokalnu_varijablu(cvor, ime, tip, value = None, ADR = None):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
-    blok_cvor.dodaj_lokalnu_varijablu(ime, tip)
+    blok_cvor.dodaj_lokalnu_varijablu(ime, tip, value, ADR)
 
-def dodaj_lokalni_niz(cvor, ime, tip, duljina):
+def dodaj_lokalni_niz(cvor, ime, tip, duljina, vrijednosti = None, ADR = None):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
-    blok_cvor.dodaj_lokalni_niz(ime, tip, duljina)
+    blok_cvor.dodaj_lokalni_niz(ime, tip, duljina, vrijednosti, ADR)
 
 def varijabla_je(cvor, idnn):
     if idnn == None:
