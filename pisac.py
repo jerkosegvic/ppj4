@@ -1,11 +1,19 @@
 lines = []
 globalne_varijable = []
+labela = 0
+naso_f = False
+
+def broj_labele():
+    global labela
+    labela += 1
+    return 'L' + str(labela)
 
 def upisi(kod):
   global lines 
 
-  
-  if kod.startswith('F_main'):
+  global naso_f
+  if kod.startswith('F_') and not naso_f:
+      naso_f = True
       lines.extend(["    CALL F_main", "    HALT"])
   
   kod = [kod]
@@ -23,7 +31,7 @@ def upisi_niz(niz_ime, velicina,vrijednosti):
 
     for i in range(velicina):
         ubac = 0
-        if i < len(vrijednosti):
+        if vrijednosti != None and i < len(vrijednosti):
             ubac = int(vrijednosti[i])
         rv += " DW " + format(ubac, 'X')
     globalne_varijable.append(rv)
@@ -40,6 +48,7 @@ def zavrsi():
     file.writelines(["    MOVE 40000, R7\n"])
     file.writelines(finalni_kod)
     file.writelines(glob_var)
+    file.write('\n')
 
 
 if __name__ == '__main__':

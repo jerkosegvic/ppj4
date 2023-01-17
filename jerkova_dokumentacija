@@ -1,0 +1,33 @@
+Ovakva je situacija. 
+Kada postavljamo vrijednost neke varijable to radimo s inicijalizatorom i on sadrži izraz pridruživanja,
+i sad u izrazu pridruživanja kažemo postfiks izraz da ne stavi svoju vrijednost na stog a drugi izraz pridruživanja 
+će stavit svoju vrijednost na stog (odnosno neki njegov potomak). i sad mi samo moramo u izrazu pridruživanja 
+onome na što se referencira postfiks postaviti tu vrijednost. Ja sam to kao napravio al bugoci su mogući.
+
+Što se tiče postfiks izraza, ako nije s lijeve strane jednakosti (a to znamo jer ako je s lijeve strane izraz pridruživanja
+će nam to javiti) i tipa je varijabla ili element niza, učitava svoju vrijednost i stavlja ju na stog.
+
+Ako je tipa funkcija, onda se poziva funkcija i stavlja se povratna vrijednost na stog.
+
+Za inkrement i dekrement cemo jos vidjeti sto i kako.
+
+Za unarni treba definirati OP_INC i OP_DEC te unarni operator (tu treba samo pomnoziti s -1 ako je minus 
+i vidit sta je op tilda, op neg je izi).
+
+CAST IZRAZ --> ne radimo nista boli nas kita.
+
+Za multiplikativni izraz moramo samo pozvati funkcije, napisano u todo-u.
+
+Za aditivni izraz ako ima 3 djece izvedemo djecu koja svoje vrijednosti zapisu na stog i samo ih skinemo obavimo operaciju 
+i vratimo rezultat na stog.
+
+Odnosni izraz bi sve trebalo biti riješeno.
+
+Jednakosni izraz bi se isto usudio reci da je vse rijeseno.
+
+Ovi binarni izrazi su jednostavni ko pekmez.
+
+Logički i i ili ni isto trebali fercerati.
+
+TODO1: RIJEŠITI PETLJE I IF-OVE
+TODO2: RIJEŠITI ONO ŠTO SAM NAPISAO U KODU, TIPA INC DEC ITD.

@@ -197,11 +197,14 @@ def dodaj_argumente(cvor, argumenti):
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
     ADR = 4 * len(argumenti)
     for arg in argumenti:
+        #if arg[1] == 'x':
+            #print("evo tu sam i adr mi je " + str(ADR) + "arg je " + str(arg))
         if arg[0].startswith('niz'):
             #print(arg[0])
             novo = arg[0][4 : len(arg[0]) - 1]
             blok_cvor.dodaj_lokalni_niz(arg[1], novo, -1)
         else:
+
             blok_cvor.dodaj_lokalnu_varijablu(arg[1], arg[0], None, ADR)
         ADR -= 4
 def provjeri_identifikator_lokalno(cvor, ime):

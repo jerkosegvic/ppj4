@@ -1,0 +1,64 @@
+Traceback (most recent call last):
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 39, in izvedi_svojstva
+    PK.upisi("    MOVE %D" + str(ord(child.vrijednost)) + ", R1")
+TypeError: ord() expected a character, but string of length 3 found
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/jerko/Documents/FER/PPJ/ppj4/GeneratorKoda.py", line 6, in <module>
+    import SemantickiAnalizator
+  File "/home/jerko/Documents/FER/PPJ/ppj4/SemantickiAnalizator.py", line 273, in <module>
+    GS.Cvor.korijen.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1440, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1430, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1457, in izvedi_svojstva
+    c1.izvedi_svojstva()  
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1690, in izvedi_svojstva
+    c2.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1708, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1766, in izvedi_svojstva
+    c3.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 2051, in izvedi_svojstva
+    c2.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 2089, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 2089, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 2089, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  [Previous line repeated 1 more time]
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 2074, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 1015, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 945, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 893, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 848, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 802, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 757, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 691, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 595, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 545, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 494, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 399, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 318, in izvedi_svojstva
+    c1.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 114, in izvedi_svojstva
+    child.izvedi_svojstva()
+  File "/home/jerko/Documents/FER/PPJ/ppj4/nezavrsni_klase.py", line 41, in izvedi_svojstva
+    print(str(ord(child.vrijednost)))
+TypeError: ord() expected a character, but string of length 3 found

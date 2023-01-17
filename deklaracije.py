@@ -12,17 +12,24 @@ class varijabla(deklaracija):
         deklaracija.__init__(self, identifikator, tip)
         self.value = value
         self.adresa = ADR
+        if identifikator.startswith('1id$$n'):
+            return 
+        
         if ADR == None:
+            #print("a ja sam retardiran i upisujem tu")
+            #ADR +=4
             PK.upisi_varijablu(identifikator, value)
             PK.upisi("    POP R1")
+            PK.upisi("    PUSH R1")
             PK.upisi("    STORE R1, (VAR_" + identifikator + ")")
         else:
             PK.upisi("    POP R1")
+            PK.upisi("    PUSH R1")
             if ADR < 0:
-                PK.upisi("    STORE R1, (R7-" + str(-ADR))
+                PK.upisi("    STORE R1, (R0-0" + str(format(-ADR, 'X')) + ')')
             else:
-                PK.upisi("    STORE R1, (R7+" + str(ADR))
-
+                #PK.upisi("    STORE R1, (R0+0" + str(format(ADR, 'X')) + ')')
+                return 
 
 class niz(deklaracija):
     def __init__(self, identifikator, tip, duljina, values = [], ADR = None):

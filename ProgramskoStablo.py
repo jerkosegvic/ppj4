@@ -30,7 +30,7 @@ class Cvor:
             if self.tablica_lokalnih_varijabli[i].adresa < min:
                 min = self.tablica_lokalnih_varijabli[i].adresa
         
-        for i in self.nasljedna_tablica_varijabli.keys():
+        for i in self.nasljedena_tablica_varijabli.keys():
             if self.nasljedena_tablica_varijabli[i].adresa == None:
                 continue
             if self.nasljedena_tablica_varijabli[i].adresa < min:
@@ -114,8 +114,10 @@ class Cvor:
             return False
         else:
             parametri = []
+            i = 0
             for parametar in parametri_tuple:
-                np = dek.varijabla(parametar[1], parametar[0])
+                np = dek.varijabla("1id$$n"+str(i), parametar[0])
                 parametri.append(np)
+                i+=1
             self.tablica_lokalnih_funkcija[ime] = dek.funkcija(ime, tip, definirana, parametri)
             return True
