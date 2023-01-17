@@ -28,7 +28,16 @@ class primarni_izraz(GS.Cvor):
                 self.tip = 'int'
                 self.lizraz = 0
                 child.izvedi_svojstva()
-                PK.upisi("    MOVE %D " + str(child.vrijednost) + ", R1")
+                if int(child.vrijednost) > 1000000:
+                    v1 = int(child.vrijednost) % 1048576
+                    v2 = int(child.vrijednost) // 1048576
+                    PK.upisi("    MOVE %D " + str(v2) + ", R1")
+                    PK.upisi("    SHL R1, 14, R1")
+                    PK.upisi("    MOVE %D " + str(v1) + ", R2")
+                    PK.upisi("    OR R1, R2, R1")
+                    
+                else:
+                    PK.upisi("    MOVE %D " + str(child.vrijednost) + ", R1")
                 PK.upisi("    PUSH R1")
 
             elif isinstance(child, ZK.ZNAK):
@@ -36,9 +45,9 @@ class primarni_izraz(GS.Cvor):
                 self.tip = 'char'
                 self.lizraz = 0
                 try:
-                    PK.upisi("    MOVE %D" + str(ord(child.vrijednost)) + ", R1")
+                    PK.upisi("    MOVE %D " + str(ord(child.vrijednost)) + ", R1")
                 except:
-                    print(str(ord(child.vrijednost)))
+                    print(str((child.vrijednost)))
                 PK.upisi("    PUSH R1")
             
             elif isinstance(child, ZK.NIZ_ZNAKOVA):
@@ -167,6 +176,10 @@ class postfiks_izraz(GS.Cvor):
                 if not self.lijevi:
                     
                     adr = self.dohvati_ref_adresu()
+                    PK.upisi("    MOVE 4, R1")
+                    PK.upisi("    PUSH R1")
+                    PK.upisi("    CALL FO_MUL")
+                    PK.upisi("    POP R1")
                     PK.upisi("    POP R1")
                     
                     if adr == None:
@@ -346,9 +359,9 @@ class unarni_izraz(GS.Cvor):
                 self.tip = 'int'
                 self.oblik = c2.oblik
                 self.lizraz = 0
-                if c1.children[0].value == ZK.MINUS:
+                if isinstance(c1.children[0], ZK.MINUS):
                     PK.upisi("    CALL FO_NEG")
-                elif c1.children[0].value == ZK.OP_NEG:
+                elif isinstance(c1.children[0], ZK.OP_NEG):
                     PK.upisi("    MOVE 0, R2")
                     PK.upisi("    POP R1")
                     PK.upisi("    CMP R1 R2")
@@ -360,7 +373,7 @@ class unarni_izraz(GS.Cvor):
                     PK.upisi(l + "  MOVE 1, R2")
                     PK.upisi("    PUSH R2")
                     PK.upisi(ll + "  ")
-                elif c1.children[0].value == ZK.OP_NEG:
+                elif isinstance(c1.children[0].value, ZK.OP_NEG):
                     PK.upisi("    MOVE -1, R2")
                     PK.upisi("    POP R1")
                     PK.upisi("    XOR R1, R2, R2")
@@ -1054,8 +1067,15 @@ class izraz_pridruzivanja(GS.Cvor):
                 else:
                     adr = c1.dohvati_ref_adresu()
                     PK.upisi("    POP R2")
-                    PK.upisi("    POP R1")
+                    PK.upisi("    POP R3")
+                    PK.upisi("    MOVE 4, R1")
                     PK.upisi("    PUSH R2")
+                    PK.upisi("    PUSH R3")
+                    PK.upisi("    PUSH R1")
+                    PK.upisi("    CALL FO_MUL")
+                    PK.upisi("    POP R1")
+                    PK.upisi("    POP R1")
+                    PK.upisi("    POP R2")
                     if adr == None:
                         PK.upisi("    MOVE VAR_" + str((c1.dohvati_idn()).ime) + ", R3")
                         PK.upisi("    ADD R3, R1, R1")
@@ -1249,8 +1269,13 @@ class naredba_grananja(GS.Cvor):
 
                 if c3.tip != 'int' or c3.oblik == 'funkcija' or c3.oblik == 'niz':
                     pomocne.izlaz(self)
-
+                l = PK.broj_labele()
+                PK.upisi("    POP R1")
+                PK.upisi("    MOVE 0, R2")
+                PK.upisi("    CMP R1, R2")
+                PK.upisi("    JP_EQ " + str(l))
                 c5.izvedi_svojstva()
+                PK.upisi(l)
             
             else:
                 pomocne.izlaz(self)
@@ -1274,9 +1299,17 @@ class naredba_grananja(GS.Cvor):
                 #tu je greska sta main shvati ko varijablu, nema oblik
                 if c3.tip != 'int' or c3.oblik == 'funkcija' or c3.oblik == 'niz':
                     pomocne.izlaz(self)
-
+                l1 = PK.broj_labele()
+                l2 = PK.broj_labele()
+                PK.upisi("    POP R1")
+                PK.upisi("    MOVE 0, R2")
+                PK.upisi("    CMP R1, R2")
+                PK.upisi("    JP_EQ " + str(l1))
                 c5.izvedi_svojstva()
+                PK.upisi("    JP " + str(l2))
+                PK.upisi(str(l1))
                 c7.izvedi_svojstva()
+                PK.upisi(str(l2))
 
             else:
                 pomocne.izlaz(self)
@@ -1759,8 +1792,9 @@ class init_deklarator(GS.Cvor):
             c3 = self.children[2]
 
             if isinstance(c1, izravni_deklarator) and isinstance(c2, ZK.OP_PRIDRUZI) and isinstance(c3, inicijalizator):
-
+                
                 c1.ntip = self.ntip
+                
                 c1.izvedi_svojstva_s_inicijalizacijom()
 
                 c3.izvedi_svojstva()
@@ -1798,10 +1832,10 @@ class init_deklarator(GS.Cvor):
                 ##VAMO PISI
                 if c1.oblik == 'var':
                     ##TODO: POPRAVI OVO
-                    pomocne.dodaj_lokalnu_varijablu(self, c1.children[0].ime, c1.children[0].tip) 
+                    pomocne.dodaj_lokalnu_varijablu(self, c1.children[0].ime, self.ntip) 
                 elif c1.oblik == 'niz':
                     ##TODO: POPRAVI OVO
-                    pomocne.dodaj_lokalni_niz(self, c1.children[0].ime, c1.children[0].tip, int(c1.children[2].vrijednost))
+                    pomocne.dodaj_lokalni_niz(self, c1.children[0].ime, self.ntip, int(c1.children[2].vrijednost))
             else:
                 pomocne.izlaz(self)
         else:
@@ -1863,6 +1897,9 @@ class izravni_deklarator(GS.Cvor):
                     pomocne.izlaz(self)
                 if int(c3.vrijednost) <= 0 or int(c3.vrijednost) > 1024:
                     pomocne.izlaz(self)
+                PK.upisi("    MOVE 0, R1")
+                for i in range(int(c3.vrijednost)):
+                    PK.upisi("    PUSH R1")
 
                 pomocne.dodaj_lokalni_niz(self, c1.ime, self.ntip, int(c3.vrijednost))
                 self.oblik = 'niz'
@@ -2074,7 +2111,7 @@ class lista_izraza_pridruzivanja(GS.Cvor):
                 c1.izvedi_svojstva()
                 self.tipovi = [c1.tip]
                 self.broj_elemenata = 1
-            ##TODO PUSHAJ TAJ SUGAVI IZRAZ NA STOG ILI SE POBRINI DA BUDE PSUHANO
+            
             else:
                 pomocne.izlaz(self)
         elif len(self.children) == 3:
@@ -2092,7 +2129,7 @@ class lista_izraza_pridruzivanja(GS.Cvor):
                 self.broj_elemenata = c1.broj_elemenata + 1
                 self.tipovi = copy.deepcopy(c1.tipovi)
                 self.tipovi.append(c3.tip)
-            ##TODO PUSHAJ TAJ SUGAVI IZRAZ NA STOG ILI SE POBRINI DA BUDE PSUHANO
+            
             else:
                 pomocne.izlaz(self)
 

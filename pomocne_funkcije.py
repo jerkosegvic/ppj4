@@ -202,7 +202,8 @@ def dodaj_argumente(cvor, argumenti):
         if arg[0].startswith('niz'):
             #print(arg[0])
             novo = arg[0][4 : len(arg[0]) - 1]
-            blok_cvor.dodaj_lokalni_niz(arg[1], novo, -1)
+            blok_cvor.dodaj_pointer(arg[1], None, ADR, novo)
+            
         else:
 
             blok_cvor.dodaj_lokalnu_varijablu(arg[1], arg[0], None, ADR)
@@ -366,3 +367,19 @@ def getaj_adresu(cvor, ime):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
     return blok_cvor.get_adresa(ime)
+
+def niz_je(cvor, ime):
+    id_bloka = GS.Cvor.tablice[cvor.id]
+    blok_cvor = PS.Cvor.cvorovi[id_bloka]
+    if ime in blok_cvor.tablica_lokalnih_varijabli.keys():
+        if isinstance(blok_cvor.tablica_lokalnih_varijabli[ime], D.niz):
+            return True
+        else:
+            return False
+    elif ime in blok_cvor.nasljedena_tablica_varijabli.keys():
+        if isinstance(blok_cvor.nasljedena_tablica_varijabli[ime], D.niz):
+            return True
+        else:
+            return False
+    else:
+        return False

@@ -39,6 +39,11 @@ class niz(deklaracija):
         self.adresa = ADR
         if ADR == None:
             PK.upisi_niz(identifikator, duljina, values)
+            PK.upisi("    MOVE VAR_" + identifikator + ", R2")
+            for i in reversed(list(range(duljina))):
+                PK.upisi("    POP R1")
+                PK.upisi("    STORE R1, (R2+0" + str(format(i*4, 'X')) + ")")
+        
 
     def zadnja_adresa(self):
         return self.adresa + (self.duljina - 1) * 4
@@ -48,4 +53,12 @@ class funkcija(deklaracija):
         deklaracija.__init__(self, identifikator, tip)
         self.parametri = parametri
         self.definirana = definirana
-        
+
+class pointer(deklaracija):
+    def __init__(self, identifikator, pointer, ADR = None, tip = None):
+        deklaracija.__init__(self, identifikator, None)
+        self.pointer = pointer
+        self.adresa = ADR
+        self.tip = tip
+        if ADR == None:
+            PK.upisi_varijablu(identifikator, None)

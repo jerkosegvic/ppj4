@@ -99,6 +99,12 @@ class Cvor:
                     ADR -=4
             self.tablica_lokalnih_varijabli[ime] = dek.niz(ime, tip, duljina, values, ADR)
             return True
+    def dodaj_pointer(self, ime, pointer, ADR, tip):
+        if ime in self.tablica_lokalnih_varijabli.keys():
+            return False
+        else:
+            self.tablica_lokalnih_varijabli[ime] = dek.pointer(ime, pointer, ADR, tip)
+            return True
 
     def dodaj_lokalnu_funkciju_void(self, ime, tip, definirana):
         if ime in self.tablica_lokalnih_funkcija.keys():

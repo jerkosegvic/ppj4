@@ -32,7 +32,10 @@ class BROJ(GS.Cvor):
 class ZNAK(GS.Cvor):
     def __init__(self, value, vr, dubina = 0, parent = None):
         GS.Cvor.__init__(self, value, dubina, parent)
-        self.vrijednost = vr
+        if len(vr) == 3:
+            self.vrijednost = vr[1]
+        else:
+            self.vrijednost = vr
 
     def izvedi_svojstva(self):
 

@@ -33,7 +33,7 @@ def upisi_niz(niz_ime, velicina,vrijednosti):
         ubac = 0
         if vrijednosti != None and i < len(vrijednosti):
             ubac = int(vrijednosti[i])
-        rv += " DW " + format(ubac, 'X')
+        rv += "    DW " + format(ubac, 'X') + "\n"
     globalne_varijable.append(rv)
 
 def zavrsi():
