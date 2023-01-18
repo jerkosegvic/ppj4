@@ -1,1 +1,1 @@
-for test in lab4_testovi/*; do python GeneratorKoda.py < $test/test.in; node ../main.js < a.frisc > a.out; echo $test; diff --ignore-all-space a.out $test/test.out; done;
+for test in lab4_testovi/*; do python GeneratorKoda.py < $test/test.in; node ../main.js < a.frisc > a.out; echo $test; diff --ignore-all-space a.out $test/test.out; done; echo "DONE";

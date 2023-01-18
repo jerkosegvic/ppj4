@@ -205,9 +205,9 @@ def dodaj_argumente(cvor, argumenti):
             blok_cvor.dodaj_pointer(arg[1], None, ADR, novo)
             
         else:
-
             blok_cvor.dodaj_lokalnu_varijablu(arg[1], arg[0], None, ADR)
         ADR -= 4
+
 def provjeri_identifikator_lokalno(cvor, ime):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
@@ -269,7 +269,7 @@ def tip_idn(cvor, ime):
         rrv = blok_cvor.nasljedena_tablica_funkcija[ime]
 
     if rrv != None:
-        if isinstance(rrv, D.niz):
+        if isinstance(rrv, D.niz) or isinstance(rrv, D.pointer):
             return "niz(" + rrv.tip + ")"
         else:
             return rrv.tip
@@ -387,6 +387,7 @@ def niz_je(cvor, ime):
 def pointer_je(cvor, ime):
     id_bloka = GS.Cvor.tablice[cvor.id]
     blok_cvor = PS.Cvor.cvorovi[id_bloka]
+    #print("tablica varijabli je ", str(blok_cvor.tablica_lokalnih_varijabli), "a ime je ", ime)
     if ime in blok_cvor.tablica_lokalnih_varijabli.keys():
         if isinstance(blok_cvor.tablica_lokalnih_varijabli[ime], D.pointer):
             return True
@@ -394,6 +395,16 @@ def pointer_je(cvor, ime):
             return False
     elif ime in blok_cvor.nasljedena_tablica_varijabli.keys():
         if isinstance(blok_cvor.nasljedena_tablica_varijabli[ime], D.pointer):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def povratni_tip_je_void(ime):
+    cvor = PS.Cvor.korijen
+    if ime in cvor.tablica_lokalnih_funkcija.keys():
+        if cvor.tablica_lokalnih_funkcija[ime].tip == 'void':
             return True
         else:
             return False

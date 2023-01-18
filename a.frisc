@@ -11,6 +11,10 @@ F_c MOVE R7, R0
     MOVE R0, R7
     RET
 
+    MOVE 0, R6
+    MOVE R0, R7
+    RET
+
 F_b MOVE R7, R0
     POP R1
     PUSH R1
@@ -35,6 +39,10 @@ F_b MOVE R7, R0
     PUSH R1
     POP R1
     MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+    MOVE 0, R6
     MOVE R0, R7
     RET
 
@@ -65,6 +73,10 @@ F_a MOVE R7, R0
     MOVE R0, R7
     RET
 
+    MOVE 0, R6
+    MOVE R0, R7
+    RET
+
 F_f MOVE R7, R0
     POP R1
     PUSH R1
@@ -92,6 +104,10 @@ F_f MOVE R7, R0
     MOVE R0, R7
     RET
 
+    MOVE 0, R6
+    MOVE R0, R7
+    RET
+
 F_main MOVE R7, R0
     PUSH R0
     MOVE %D 1, R1
@@ -102,6 +118,10 @@ F_main MOVE R7, R0
     PUSH R6
     POP R1
     MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+    MOVE 0, R6
     MOVE R0, R7
     RET
 

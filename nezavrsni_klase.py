@@ -130,6 +130,7 @@ class postfiks_izraz(GS.Cvor):
                 self.lizraz = child.lizraz
             else:
                 pomocne.izlaz(self)
+
             if child.oblik == None:
                 dhv = self.dohvati_idn()
                 if dhv is not None:
@@ -137,6 +138,11 @@ class postfiks_izraz(GS.Cvor):
                     self.oblik = pomocne.nadi_oblik(self, dhv)
             else:
                 self.oblik = child.oblik
+            
+            if not isinstance(child.children[0], ZK.IDN) or self.lijevi:
+                return
+            
+            idn = self.dohvati_idn()
             if not self.lijevi and self.oblik == 'var':
                 adresa = self.dohvati_ref_adresu()
                 if adresa == None:
@@ -147,6 +153,21 @@ class postfiks_izraz(GS.Cvor):
                     PK.upisi("    LOAD R1, (R0+0" + str(format(adresa, 'X')) + ")")
                 PK.upisi("    PUSH R1")
             
+            elif not isinstance(self.parent, postfiks_izraz) and idn != None:
+                adresa = self.dohvati_ref_adresu()
+                if adresa == None:
+                    PK.upisi("    MOVE VAR_" + str((self.dohvati_idn()).ime) + " , R1")
+                
+                elif adresa < 0:
+                    PK.upisi("    MOVE R0, R1")
+                    PK.upisi("    MOVE %D " + str(-adresa) + ", R2")
+                    PK.upisi("    SUB R1, R2, R1")
+                else:
+                    PK.upisi("    MOVE R0, R1")
+                    PK.upisi("    MOVE %D " + str(adresa) + ", R2")
+                    PK.upisi("    ADD R2, R1, R1")
+                PK.upisi("    PUSH R1")
+
 
 
         elif len(self.children) == 4: 
@@ -163,6 +184,7 @@ class postfiks_izraz(GS.Cvor):
                 if c1.oblik != 'niz':
                     pomocne.izlaz(self)
 
+                #print("evo tu sam i c1.tip je ", c1.tip, " a c1.oblik je ", c1.oblik, " a c1.lizraz je ", c1.lizraz)
                 if c1.tip.startswith('niz'): #trebamo se jos dogovorit kako tip odredit, ugl ovo mora provjeravat je li c1 dopušteni niz
                     # niz tipa niz(niz(int)) nije dopušten!
                     tip = c1.tip[4:len(c1.tip)-1]
@@ -178,28 +200,58 @@ class postfiks_izraz(GS.Cvor):
 
                     if c3.tip != 'int':
                         pomocne.izlaz(self)
+                else:
+                    pomocne.izlaz(self)
 
-                if not self.lijevi:
-                    
-                    adr = self.dohvati_ref_adresu()
-                    PK.upisi("    MOVE 4, R1")
-                    PK.upisi("    PUSH R1")
-                    PK.upisi("    CALL FO_MUL")
-                    PK.upisi("    POP R1")
-                    PK.upisi("    POP R1")
-                    
-                    if adr == None:
-                        ##TODO: ISPRAVI NEKAKO OVO INDEKSIRANJE GLOBALNOG NIZA
-                        PK.upisi("    MOVE VAR_" + str((self.dohvati_idn()).ime) + ", R3")
-                        PK.upisi("    ADD R3, R1, R1")
-                        PK.upisi("    LOAD R2, (R1)")
-                    elif(adr < 0):
-                        PK.upisi("    ADD R0, R1, R1")
-                        PK.upisi("    LOAD R2, (R1-0" + str(format(-adr, 'X')) + ")")
-                    else:
-                        PK.upisi("    ADD R0, R1, R1")
-                        PK.upisi("    LOAD R2, (R1+0" + str(format(adr, 'X')) + ")")
-                    PK.upisi("    PUSH R2")
+                idn = c1.dohvati_idn()
+                if not self.lijevi and idn != None:
+                    if pomocne.niz_je(self, idn.ime):
+                        adr = self.dohvati_ref_adresu()
+                        PK.upisi("    MOVE 4, R1")
+                        PK.upisi("    PUSH R1")
+                        PK.upisi("    CALL FO_MUL")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R1")
+                        
+                        if adr == None:
+                            ##TODO: ISPRAVI NEKAKO OVO INDEKSIRANJE GLOBALNOG NIZA
+                            PK.upisi("    MOVE VAR_" + str((self.dohvati_idn()).ime) + ", R3")
+                            PK.upisi("    ADD R3, R1, R1")
+                            PK.upisi("    LOAD R2, (R1)")
+                        elif(adr < 0):
+                            PK.upisi("    ADD R0, R1, R1")
+                            PK.upisi("    LOAD R2, (R1-0" + str(format(-adr, 'X')) + ")")
+                        else:
+                            PK.upisi("    ADD R0, R1, R1")
+                            PK.upisi("    LOAD R2, (R1+0" + str(format(adr, 'X')) + ")")
+                        PK.upisi("    PUSH R2")
+
+                    elif pomocne.pointer_je(self, idn.ime):
+                        adr = self.dohvati_ref_adresu()
+                        PK.upisi("    MOVE 4, R1")
+                        PK.upisi("    PUSH R1")
+                        PK.upisi("    CALL FO_MUL")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R1")
+                        if adr == None:
+                            PK.upisi("    MOVE VAR_" + str((self.dohvati_idn()).ime) + ", R3")
+                            PK.upisi("    LOAD R2, (R3)")
+                            PK.upisi("    ADD R2, R1, R1")
+                            PK.upisi("    LOAD R2, (R1)")
+                        elif(adr < 0):
+                            PK.upisi("    MOVE %D " + str(-adr) + ", R2")
+                            PK.upisi("    SUB R0, R2, R2")
+                            PK.upisi("    LOAD R3, (R2)")
+                            PK.upisi("    ADD R3, R1, R1")
+                            PK.upisi("    LOAD R2, (R1)")
+                        else:
+                            PK.upisi("    MOVE %D " + str(adr) + ", R2")
+                            PK.upisi("    ADD R0, R2, R2")
+                            PK.upisi("    LOAD R3, (R2)")
+                            PK.upisi("    ADD R3, R1, R1")
+                            PK.upisi("    LOAD R2, (R1)")
+                        PK.upisi("    PUSH R2")
+
 
             elif isinstance(c1, postfiks_izraz) and isinstance(c2, ZK.L_ZAGRADA) and isinstance(c3, lista_argumenata) and isinstance(c4, ZK.D_ZAGRADA):
                 #ovo je za poziv funckije s argumentima!
@@ -227,7 +279,9 @@ class postfiks_izraz(GS.Cvor):
                 for i in range(c3.broj_argumenata()):
                     PK.upisi("    POP R1")    
                 PK.upisi("    POP R0")
-                PK.upisi("    PUSH R6")
+                idn = c1.dohvati_idn().ime
+                if not pomocne.povratni_tip_je_void(idn):
+                    PK.upisi("    PUSH R6")
             else:
                 pomocne.izlaz(self)
         
@@ -257,7 +311,9 @@ class postfiks_izraz(GS.Cvor):
                 PK.upisi("    PUSH R0")
                 PK.upisi("    CALL F_" + c1.dohvati_idn().ime)
                 PK.upisi("    POP R0")
-                PK.upisi("    PUSH R6")
+                idn = c1.dohvati_idn().ime
+                if not pomocne.povratni_tip_je_void(idn):
+                    PK.upisi("    PUSH R6")
             else:
                 pomocne.izlaz(self)
         
@@ -361,7 +417,8 @@ class lista_argumenata(GS.Cvor):
 
                 self.tipovi = copy.deepcopy(c1.tipovi)
                 self.tipovi.append(c3.tip)
-                if c3.oblik == 'niz' or c3.oblik == 'funkcija' or  c1.oblik == 'niz' or c1.oblik == 'funkcija':
+                if c3.oblik == 'funkcija' or  c1.oblik == 'niz' or c1.oblik == 'funkcija':
+                    print("zbog ovog se srusim ", c3.oblik , c1.oblik)
                     pomocne.izlaz(self)
                 self.oblik = None
 
@@ -1188,6 +1245,8 @@ class izraz_pridruzivanja(GS.Cvor):
                 c3.izvedi_svojstva()
                 
                 if c1.tip != c3.tip:
+                    #print("tu me zjebalo")
+                    #print("tipovi su ", c1.tip, " i ", c3.tip)
                     pomocne.izlaz(self)
 
                 if c1.lizraz == 0:
@@ -1202,7 +1261,11 @@ class izraz_pridruzivanja(GS.Cvor):
 
                 #if self.dio_izraza():
                 #    return
+                idn = c1.dohvati_idn()
+                if idn == None:
+                    return
 
+                #print("tu sam batice i c1.oblik mi je " , c1.oblik)
                 if c1.oblik == 'var':
                     adr = c1.dohvati_ref_adresu()
                     PK.upisi("    LOAD R1, (R7)")
@@ -1215,28 +1278,61 @@ class izraz_pridruzivanja(GS.Cvor):
                 
                 elif c1.oblik == 'indeksirani_niz':
                     adr = c1.dohvati_ref_adresu()
-                    PK.upisi("    POP R2")
-                    PK.upisi("    POP R3")
-                    PK.upisi("    MOVE 4, R1")
-                    PK.upisi("    PUSH R2")
-                    PK.upisi("    PUSH R3")
-                    PK.upisi("    PUSH R1")
-                    PK.upisi("    CALL FO_MUL")
-                    PK.upisi("    POP R1")
-                    PK.upisi("    POP R1")
-                    PK.upisi("    POP R2")
-                    if adr == None:
-                        PK.upisi("    MOVE VAR_" + str((c1.dohvati_idn()).ime) + ", R3")
-                        PK.upisi("    ADD R3, R1, R1")
-                        ##TODO: ISPRAVI NEKAKO OVO INDEKSIRANJE GLOBALNOG NIZA
-                        PK.upisi("    STORE R2, (R1)")
-                    elif(adr < 0):
-                        PK.upisi("    ADD R0, R1, R1")
-                        PK.upisi("    STORE R2, (R1-0" + str(format(-adr, 'X')) + ")")
+                    if pomocne.niz_je(c1, idn.ime):
+                        PK.upisi("    POP R2")
+                        PK.upisi("    POP R3")
+                        PK.upisi("    MOVE 4, R1")
+                        PK.upisi("    PUSH R2")
+                        PK.upisi("    PUSH R3")
+                        PK.upisi("    PUSH R1")
+                        PK.upisi("    CALL FO_MUL")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R2")
+                        if adr == None:
+                            PK.upisi("    MOVE VAR_" + str((c1.dohvati_idn()).ime) + ", R3")
+                            PK.upisi("    ADD R3, R1, R1")
+                            ##TODO: ISPRAVI NEKAKO OVO INDEKSIRANJE GLOBALNOG NIZA
+                            PK.upisi("    STORE R2, (R1)")
+                        elif(adr < 0):
+                            PK.upisi("    ADD R0, R1, R1")
+                            PK.upisi("    STORE R2, (R1-0" + str(format(-adr, 'X')) + ")")
+                        else:
+                            PK.upisi("    ADD R0, R1, R1")
+                            PK.upisi("    STORE R2, (R1+0" + str(format(adr, 'X')) + ")")
+                        PK.upisi("    PUSH R2")
+
+                    elif pomocne.pointer_je(c1, idn.ime):
+                        PK.upisi("    POP R2")
+                        PK.upisi("    POP R3")
+                        PK.upisi("    MOVE 4, R1")
+                        PK.upisi("    PUSH R2")
+                        PK.upisi("    PUSH R3")
+                        PK.upisi("    PUSH R1")
+                        PK.upisi("    CALL FO_MUL")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R1")
+                        PK.upisi("    POP R2")
+                        if adr == None:
+                            PK.upisi("    MOVE VAR_" + str((self.dohvati_idn()).ime) + ", R3")
+                            PK.upisi("    LOAD R4, (R3)")
+                            PK.upisi("    ADD R4, R1, R1")
+                            PK.upisi("    STORE R2, (R1)")
+                        elif(adr < 0):
+                            PK.upisi("    MOVE %D " + str(-adr) + ", R4")
+                            PK.upisi("    SUB R0, R4, R4")
+                            PK.upisi("    LOAD R3, (R4)")
+                            PK.upisi("    ADD R3, R1, R1")
+                            PK.upisi("    STORE R2, (R1)")
+                        else:
+                            PK.upisi("    MOVE %D " + str(adr) + ", R4")
+                            PK.upisi("    ADD R0, R4, R4")
+                            PK.upisi("    LOAD R3, (R4)")
+                            PK.upisi("    ADD R3, R1, R1")
+                            PK.upisi("    STORE R2, (R1)")
+                        PK.upisi("    PUSH R2")
                     else:
-                        PK.upisi("    ADD R0, R1, R1")
-                        PK.upisi("    STORE R2, (R1+0" + str(format(adr, 'X')) + ")")
-                    PK.upisi("    PUSH R2")
+                        print("retardiran sam")
             else:
                 pomocne.izlaz(self)
         else:
@@ -1710,6 +1806,9 @@ class definicija_funkcije(GS.Cvor):
                 
                 c6.izvedi_svojstva()
                 self.oblik = 'definirana_funkcija'
+                PK.upisi("    MOVE 0, R6")
+                PK.upisi("    MOVE R0, R7")
+                PK.upisi("    RET\n")
 
             elif isinstance(c1, ime_tipa) and isinstance(c2, ZK.IDN) and isinstance(c3, ZK.L_ZAGRADA) \
                 and isinstance(c4, lista_parametara) and isinstance(c5, ZK.D_ZAGRADA) and isinstance(c6, slozena_naredba):
@@ -1740,7 +1839,9 @@ class definicija_funkcije(GS.Cvor):
 
                 c6.izvedi_svojstva()
                 self.oblik = 'definirana_funkcija'
-
+                PK.upisi("    MOVE 0, R6")
+                PK.upisi("    MOVE R0, R7")
+                PK.upisi("    RET\n")
             else:
                 pomocne.izlaz(self)
         else:

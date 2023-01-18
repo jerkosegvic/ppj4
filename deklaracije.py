@@ -69,5 +69,7 @@ class pointer(deklaracija):
         self.pointer = pointer
         self.adresa = ADR
         self.tip = tip
+        #print("skombo sam pointer s adresom " , ADR)
         if ADR == None:
             PK.upisi_varijablu(identifikator, None)
+        
