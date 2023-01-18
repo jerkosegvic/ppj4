@@ -1344,13 +1344,17 @@ class naredba_petlje(GS.Cvor):
 
             if isinstance(c1, ZK.KR_WHILE) and isinstance(c2, ZK.L_ZAGRADA) and isinstance(c3, izraz) \
                 and isinstance(c4, ZK.D_ZAGRADA) and isinstance(c5, naredba):
-
+                PK.upisi('WHILE_START')
                 c3.izvedi_svojstva()
-
+                PK.upisi('   POP R1')
+                PK.upisi('  ADD R1, R1, R1')
+                PK.upisi('  JP_Z WHILE_OUT')
                 if c3.tip != 'int' or c3.oblik == 'funkcija' or c3.oblik == 'niz':
                     pomocne.izlaz(self)
 
                 c5.izvedi_svojstva()
+                PK.upisi('  JP WHILE_START')
+                PK.upisi('WHILE_OUT')
             
             else:
                 pomocne.izlaz(self)
@@ -1389,7 +1393,14 @@ class naredba_petlje(GS.Cvor):
                and isinstance(c4, izraz_naredba) and isinstance(c5, izraz) and isinstance(c6, ZK.D_ZAGRADA) and isinstance(c7, naredba):
 
                c3.izvedi_svojstva()
+               PK.upisi('FOR_START')
                c4.izvedi_svojstva()
+               PK.upisi('   POP R1')
+               PK.upisi(' ADD R1, R1, R1')
+               PK.upisi(' JP_Z FOR_OUT')
+               PK.upisi(' JP FOR_BODY')
+               
+            
                #print(c4.tip)
                #ovdje je greska sto gleda funkcije i varijable jednako
                #oblik se ne propagira do ovdje pa to treba pogledat
@@ -1399,9 +1410,14 @@ class naredba_petlje(GS.Cvor):
                 #OVO TREBA PROVJERITI JOŠ JEDNOM 
                 #or c5.oblik == 'funkcija' or c5.oblik == 'niz':
                     pomocne.izlaz(self)
-               
+               PK.upisi('FOR_INC')
                c5.izvedi_svojstva()
+               PK.upisi(' JP FOR_START')
+               PK.upisi('FOR_BODY')
                c7.izvedi_svojstva()
+               PK.upisi(' JP FOR_INC')
+               PK.upisi('FOR_OUT')
+
             else:
                 pomocne.izlaz(self)
         else:

@@ -2,6 +2,7 @@
     CALL F_main
     HALT
 F_main MOVE R7, R0
+<<<<<<< HEAD
     MOVE %D 1, R1
     PUSH R1
     CALL FO_NEG
@@ -10,6 +11,60 @@ F_main MOVE R7, R0
     POP R1
     POP R2
     OR R1, R2, R1
+=======
+    MOVE %D 0, R1
+    PUSH R1
+    POP R1
+    PUSH R1
+    STORE R1, (R0-04)
+    MOVE %D 15, R1
+    PUSH R1
+    POP R1
+    PUSH R1
+    STORE R1, (R0-08)
+WHILE_START
+    LOAD R1, (R0-08)
+    PUSH R1
+    MOVE %D 0, R1
+    PUSH R1
+    POP R2
+    POP R1
+    CMP R1, R2
+    JP_SGE L1
+    MOVE 0, R1
+    PUSH R1
+    JP L2
+L1    
+    MOVE 1, R1
+    PUSH R1
+L2    
+   POP R1
+  ADD R1, R1, R1
+  JP_Z WHILE_OUT
+    LOAD R1, (R0-04)
+    PUSH R1
+    MOVE %D 1, R1
+    PUSH R1
+    POP R1
+    POP R2
+    ADD R1, R2, R1
+    PUSH R1
+    LOAD R1, (R7)
+    STORE R1, (R0-04)
+    LOAD R1, (R0-08)
+    PUSH R1
+    MOVE %D 1, R1
+    PUSH R1
+    POP R1
+    POP R2
+    SUB R2, R1, R1
+    PUSH R1
+    LOAD R1, (R7)
+    STORE R1, (R0-08)
+  JP WHILE_START
+WHILE_OUT
+    LOAD R1, (R0-04)
+>>>>>>> origin/mislav
     PUSH R1
     POP R1
     MOVE R1, R6
