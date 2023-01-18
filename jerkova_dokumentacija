@@ -31,8 +31,30 @@ Logički i i ili ni isto trebali fercerati.
 
 TODO1: RIJEŠITI PETLJE
 TODO2: RIJEŠITI INC DEC
-TODO3: RIJEŠITI POINTERE :((
-
+TODO3: RIJEŠITI NIZOVE -> TREBA SVUGDJE BITI PRVI ELEMENT NA NAJMANJOJ A ZADNJI NA NAJVEĆOJ ADRESI!!!
+TODO4: RIJEŠITI POINTERE :((
 
 NA DNU STOGA CE MI BITI PRVI ELEMENT NIZA A NA VRHU STOGA CE MI BITI ZADNJI ELEMENT NIZA
 
+TEMPLATE ZA INIT_DEKLARATOR:
+
+dakle prije nego šro pozovem izvedi svojstva za inicijalizator, treba vidjeti radi li se o nizu.
+
+Ako da treba rezervirati odgovarajuću količinu memorije na stogu, to je najbolje napraviti u 
+izravnom deklaratoru s inicijalizacijom.
+
+I sad kad se izvede sve ovo, treba sve poskidat sa stoga(to radimo u init_deklaratoru) i spremit na odgovarajuću 
+lokaciju na stogu(koju smo rezervirali prije).
+
+dakle drugim rijecima treba dodati nesto u stilu:
+
+a = dohvati_adresu_niza()
+for i in range(duljina):
+    PK.upisi("    POP R1")
+    PK.upisi("    STORE R1, (R0-, " + str(format( str(-(a + i)) , )) + ")")
+
+
+Sto se pointera tice treba u postfiks izrazu kada dohvacamo vrijednost provjeriti radi li se o pointeru i ako 
+da treba napisati asembler za adresiranje pointera.
+
+Također treba napisati asembler za adresiranje pointera u izrazu pridruživanja.
