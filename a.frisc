@@ -1,47 +1,23 @@
     MOVE 40000, R7
     CALL F_main
     HALT
-F_main MOVE R7, R0
-<<<<<<< HEAD
-    MOVE %D 1, R1
-    PUSH R1
-    CALL FO_NEG
-    MOVE %D 468, R1
-    PUSH R1
-    POP R1
-    POP R2
-    OR R1, R2, R1
-=======
-    MOVE %D 0, R1
-    PUSH R1
+F_c MOVE R7, R0
     POP R1
     PUSH R1
-    STORE R1, (R0-04)
-    MOVE %D 15, R1
+    LOAD R1, (R0+04)
     PUSH R1
     POP R1
-    PUSH R1
-    STORE R1, (R0-08)
-WHILE_START
-    LOAD R1, (R0-08)
-    PUSH R1
-    MOVE %D 0, R1
-    PUSH R1
-    POP R2
+    MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+F_b MOVE R7, R0
     POP R1
-    CMP R1, R2
-    JP_SGE L1
-    MOVE 0, R1
     PUSH R1
-    JP L2
-L1    
-    MOVE 1, R1
+    LOAD R1, (R0+04)
     PUSH R1
-L2    
-   POP R1
-  ADD R1, R1, R1
-  JP_Z WHILE_OUT
-    LOAD R1, (R0-04)
+    PUSH R0
+    LOAD R1, (R0+04)
     PUSH R1
     MOVE %D 1, R1
     PUSH R1
@@ -49,23 +25,81 @@ L2
     POP R2
     ADD R1, R2, R1
     PUSH R1
-    LOAD R1, (R7)
-    STORE R1, (R0-04)
-    LOAD R1, (R0-08)
+    CALL F_c
+    POP R1
+    POP R0
+    PUSH R6
+    POP R1
+    POP R2
+    ADD R1, R2, R1
+    PUSH R1
+    POP R1
+    MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+F_a MOVE R7, R0
+    POP R1
+    PUSH R1
+    LOAD R1, (R0+04)
+    PUSH R1
+    PUSH R0
+    LOAD R1, (R0+04)
     PUSH R1
     MOVE %D 1, R1
     PUSH R1
     POP R1
     POP R2
-    SUB R2, R1, R1
+    ADD R1, R2, R1
     PUSH R1
-    LOAD R1, (R7)
-    STORE R1, (R0-08)
-  JP WHILE_START
-WHILE_OUT
-    LOAD R1, (R0-04)
->>>>>>> origin/mislav
+    CALL F_b
+    POP R1
+    POP R0
+    PUSH R6
+    POP R1
+    POP R2
+    ADD R1, R2, R1
     PUSH R1
+    POP R1
+    MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+F_f MOVE R7, R0
+    POP R1
+    PUSH R1
+    PUSH R0
+    LOAD R1, (R0+04)
+    PUSH R1
+    MOVE %D 1, R1
+    PUSH R1
+    POP R1
+    POP R2
+    ADD R1, R2, R1
+    PUSH R1
+    CALL F_a
+    POP R1
+    POP R0
+    PUSH R6
+    LOAD R1, (R0+04)
+    PUSH R1
+    POP R1
+    POP R2
+    ADD R1, R2, R1
+    PUSH R1
+    POP R1
+    MOVE R1, R6
+    MOVE R0, R7
+    RET
+
+F_main MOVE R7, R0
+    PUSH R0
+    MOVE %D 1, R1
+    PUSH R1
+    CALL F_f
+    POP R1
+    POP R0
+    PUSH R6
     POP R1
     MOVE R1, R6
     MOVE R0, R7
