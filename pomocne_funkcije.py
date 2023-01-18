@@ -383,3 +383,19 @@ def niz_je(cvor, ime):
             return False
     else:
         return False
+
+def pointer_je(cvor, ime):
+    id_bloka = GS.Cvor.tablice[cvor.id]
+    blok_cvor = PS.Cvor.cvorovi[id_bloka]
+    if ime in blok_cvor.tablica_lokalnih_varijabli.keys():
+        if isinstance(blok_cvor.tablica_lokalnih_varijabli[ime], D.pointer):
+            return True
+        else:
+            return False
+    elif ime in blok_cvor.nasljedena_tablica_varijabli.keys():
+        if isinstance(blok_cvor.nasljedena_tablica_varijabli[ime], D.pointer):
+            return True
+        else:
+            return False
+    else:
+        return False

@@ -1797,6 +1797,7 @@ class init_deklarator(GS.Cvor):
                 
                 c1.izvedi_svojstva_s_inicijalizacijom()
 
+
                 c3.izvedi_svojstva()
 
                 #nemam snage za provjerit 3 jbg
@@ -2002,7 +2003,9 @@ class izravni_deklarator(GS.Cvor):
                 self.broj_elemenata = int(c3.vrijednost)
 
                 #zabilježi deklaraciju i tip!!!!!!!!!!!!!!!!!!!!
-
+                PK.upisi("    MOVE 0, R1")
+                for i in range(int(c3.vrijednost)):
+                    PK.upisi("    PUSH R1")
             elif isinstance(c1, ZK.IDN) and isinstance(c2, ZK.L_ZAGRADA) and \
                 isinstance(c3, ZK.KR_VOID) and isinstance(c4, ZK.D_ZAGRADA):
 
