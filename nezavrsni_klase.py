@@ -54,6 +54,11 @@ class primarni_izraz(GS.Cvor):
                 child.izvedi_svojstva()
                 self.tip = 'niz(const(char))'
                 self.lizraz = 0
+                for znak in child.vrijednost:
+                    if znak == '\'' or znak == '\"':
+                        continue
+                    PK.upisi("    MOVE %D " + str(ord(znak)) + ", R1")
+                    PK.upisi("    PUSH R1")
             
             else:
                 pomocne.izlaz(self)     
@@ -130,7 +135,8 @@ class postfiks_izraz(GS.Cvor):
                 if dhv is not None:
                     #print("za cvor ", self, "dohvacen idn ", dhv.ime)
                     self.oblik = pomocne.nadi_oblik(self, dhv)
-                    
+            else:
+                self.oblik = child.oblik
             if not self.lijevi and self.oblik == 'var':
                 adresa = self.dohvati_ref_adresu()
                 if adresa == None:
@@ -188,10 +194,10 @@ class postfiks_izraz(GS.Cvor):
                         PK.upisi("    ADD R3, R1, R1")
                         PK.upisi("    LOAD R2, (R1)")
                     elif(adr < 0):
-                        PK.upisi("    SUB R0, R1, R1")
+                        PK.upisi("    ADD R0, R1, R1")
                         PK.upisi("    LOAD R2, (R1-0" + str(format(-adr, 'X')) + ")")
                     else:
-                        PK.upisi("    SUB R0, R1, R1")
+                        PK.upisi("    ADD R0, R1, R1")
                         PK.upisi("    LOAD R2, (R1+0" + str(format(adr, 'X')) + ")")
                     PK.upisi("    PUSH R2")
 
@@ -725,7 +731,8 @@ class jednakosni_izraz(GS.Cvor):
                 if c3.oblik == 'niz' or c3.oblik == 'funkcija' or  c1.oblik == 'niz' or c1.oblik == 'funkcija':
                     pomocne.izlaz(self)
                 self.oblik = None
-
+                PK.upisi("    POP R2")
+                PK.upisi("    POP R1")
                 if isinstance(c2,ZK.OP_EQ):
                     lc0 = PK.broj_labele()
                     lc1 = PK.broj_labele()
@@ -1004,7 +1011,8 @@ class izraz_pridruzivanja(GS.Cvor):
         self.argument = False
 
     def postaje_niz_znakova(self):
-        return self.tip == 'char' and self.oblik == 'niz'
+        #print("tu sam i oblik je ", self.oblik, " a tip je ", self.tip)
+        return (self.tip == 'char' and self.oblik == 'niz') or self.tip == "niz(const(char))" or self.tip == "niz(char)"
 
     def dohvati_NIZ_ZNAKOVA(self):
         #print("dohvacam idn za postfiks izraz ", str(self))
@@ -1064,7 +1072,7 @@ class izraz_pridruzivanja(GS.Cvor):
                     else:
                         PK.upisi("    STORE R1, (R0+0" + str(format(adr, 'X')) + ")")
                 
-                else:
+                elif c1.oblik == 'indeksirani_niz':
                     adr = c1.dohvati_ref_adresu()
                     PK.upisi("    POP R2")
                     PK.upisi("    POP R3")
@@ -1082,10 +1090,10 @@ class izraz_pridruzivanja(GS.Cvor):
                         ##TODO: ISPRAVI NEKAKO OVO INDEKSIRANJE GLOBALNOG NIZA
                         PK.upisi("    STORE R2, (R1)")
                     elif(adr < 0):
-                        PK.upisi("    SUB R0, R1, R1")
+                        PK.upisi("    ADD R0, R1, R1")
                         PK.upisi("    STORE R2, (R1-0" + str(format(-adr, 'X')) + ")")
                     else:
-                        PK.upisi("    SUB R0, R1, R1")
+                        PK.upisi("    ADD R0, R1, R1")
                         PK.upisi("    STORE R2, (R1+0" + str(format(adr, 'X')) + ")")
 
             else:
@@ -1826,17 +1834,21 @@ class init_deklarator(GS.Cvor):
 
                     for t in c3.tipovi:
                         if t != tip:
-                            pomocne.izlaz(self)
+                            pass
+                            #pomocne.izlaz(self)
                 #print(c3.oblik)
                 if c3.oblik == 'funkcija':
                     pomocne.izlaz(self)
                 ##VAMO PISI
                 if c1.oblik == 'var':
                     ##TODO: POPRAVI OVO
-                    pomocne.dodaj_lokalnu_varijablu(self, c1.children[0].ime, self.ntip) 
+                    pomocne.dodaj_lokalnu_varijablu(self, c1.children[0].ime, self.ntip, None, None) 
                 elif c1.oblik == 'niz':
                     ##TODO: POPRAVI OVO
-                    pomocne.dodaj_lokalni_niz(self, c1.children[0].ime, self.ntip, int(c1.children[2].vrijednost))
+                    PK.upisi("    MOVE %D 1, R1")
+                    for i in range (int(c1.children[2].vrijednost) - c3.broj_elemenata):
+                        PK.upisi("    PUSH R1")
+                    pomocne.dodaj_lokalni_niz(self, c1.children[0].ime, self.ntip, int(c1.children[2].vrijednost), None, None, True)
             else:
                 pomocne.izlaz(self)
         else:
@@ -2065,12 +2077,13 @@ class inicijalizator(GS.Cvor):
 
             if isinstance(c1, izraz_pridruzivanja):
                 c1.izvedi_svojstva()
+                #print("ne postaje niz znakova??")
                 if c1.postaje_niz_znakova():
                     nz = c1.dohvati_NIZ_ZNAKOVA()
                     if nz == None:
                         pomocne.izlaz(self)
-
-                    self.broj_elemenata = len(nz.duljina)
+                    #print("tu sam i broj argumenata je ", nz.duljina, " a niz je ", nz.vrijednost)
+                    self.broj_elemenata = nz.duljina
                     self.tipovi = ['char' for _ in range(self.broj_elemenata)]
                 else:
 

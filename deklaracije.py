@@ -32,7 +32,7 @@ class varijabla(deklaracija):
                 return 
 
 class niz(deklaracija):
-    def __init__(self, identifikator, tip, duljina, values = [], ADR = None):
+    def __init__(self, identifikator, tip, duljina, values = [], ADR = None, init = False):
         deklaracija.__init__(self, identifikator, tip)
         self.duljina = duljina
         self.values = values
@@ -44,7 +44,16 @@ class niz(deklaracija):
                 PK.upisi("    POP R1")
                 PK.upisi("    STORE R1, (R2+0" + str(format(i*4, 'X')) + ")")
         
+        elif init:
+            a = -ADR 
+            for i in range(duljina):
+                PK.upisi("    POP R1")
+                PK.upisi("    STORE R1, (R0-0" + str(format(a, 'X')) + ")")
+                a += 4
 
+        if ADR != None:
+            ADR -= (self.duljina - 1) * 4
+            self.adresa = ADR
     def zadnja_adresa(self):
         return self.adresa + (self.duljina - 1) * 4
 

@@ -89,7 +89,7 @@ class Cvor:
             self.tablica_lokalnih_varijabli[ime] = dek.varijabla(ime, tip, value, ADR)
             return True
 
-    def dodaj_lokalni_niz(self, ime, tip, duljina, values = [], ADR = None):
+    def dodaj_lokalni_niz(self, ime, tip, duljina, values = [], ADR = None, init = False):
         if ime in self.tablica_lokalnih_varijabli.keys():
             return False
         else:
@@ -97,7 +97,7 @@ class Cvor:
                 ADR = self.get_sp()
                 if ADR != None:
                     ADR -=4
-            self.tablica_lokalnih_varijabli[ime] = dek.niz(ime, tip, duljina, values, ADR)
+            self.tablica_lokalnih_varijabli[ime] = dek.niz(ime, tip, duljina, values, ADR, init)
             return True
     def dodaj_pointer(self, ime, pointer, ADR, tip):
         if ime in self.tablica_lokalnih_varijabli.keys():
