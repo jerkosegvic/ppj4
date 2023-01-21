@@ -23,9 +23,9 @@ class varijabla(deklaracija):
             PK.upisi("    PUSH R1")
             PK.upisi("    STORE R1, (VAR_" + identifikator + ")")
         else:
-            PK.upisi("    POP R1")
-            PK.upisi("    PUSH R1")
             if ADR < 0:
+                PK.upisi("    POP R1")
+                PK.upisi("    PUSH R1")
                 PK.upisi("    STORE R1, (R0-0" + str(format(-ADR, 'X')) + ')')
             else:
                 #PK.upisi("    STORE R1, (R0+0" + str(format(ADR, 'X')) + ')')

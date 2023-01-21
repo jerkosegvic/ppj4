@@ -1,1 +1,1 @@
-for test in 1-t/*; do python GeneratorKoda.py < $test/test.in; node ../ppj4_sim/main.js < a.frisc > a.out; echo $test; diff a.out $test/test.out; done;
+for test in 1-t2/*; do python GeneratorKoda.py < $test/test.in; node ../main.js < a.frisc > a.out; echo $test; diff a.out $test/test.out; done; echo "DONE";

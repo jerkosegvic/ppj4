@@ -1,1 +1,1 @@
-for test in 1-t/*; do python GeneratorKoda.py < $test/test.in; node ../main.js < a.frisc > a.out; echo $test; diff a.out $test/test.out; done;echo "DONE";
+for test in 1-t/*; do python GeneratorKoda.py < $test/test.in; node ../main.js < a.frisc > a.out; echo $test; diff a.out $test/test.out; done; echo "DONE";

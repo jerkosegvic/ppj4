@@ -28,11 +28,11 @@ class primarni_izraz(GS.Cvor):
                 self.tip = 'int'
                 self.lizraz = 0
                 child.izvedi_svojstva()
-                if int(child.vrijednost) > 1000000:
-                    v1 = int(child.vrijednost) % 1048576
-                    v2 = int(child.vrijednost) // 1048576
+                if int(child.vrijednost) > 262144:
+                    v1 = int(child.vrijednost) % 262144
+                    v2 = int(child.vrijednost) // 262144
                     PK.upisi("    MOVE %D " + str(v2) + ", R1")
-                    PK.upisi("    SHL R1, 14, R1")
+                    PK.upisi("    SHL R1, 12, R1")
                     PK.upisi("    MOVE %D " + str(v1) + ", R2")
                     PK.upisi("    OR R1, R2, R1")
                     
@@ -418,7 +418,7 @@ class lista_argumenata(GS.Cvor):
                 self.tipovi = copy.deepcopy(c1.tipovi)
                 self.tipovi.append(c3.tip)
                 if c3.oblik == 'funkcija' or  c1.oblik == 'niz' or c1.oblik == 'funkcija':
-                    print("zbog ovog se srusim ", c3.oblik , c1.oblik)
+                    #print("zbog ovog se srusim ", c3.oblik , c1.oblik)
                     pomocne.izlaz(self)
                 self.oblik = None
 
@@ -1813,6 +1813,7 @@ class definicija_funkcije(GS.Cvor):
             elif isinstance(c1, ime_tipa) and isinstance(c2, ZK.IDN) and isinstance(c3, ZK.L_ZAGRADA) \
                 and isinstance(c4, lista_parametara) and isinstance(c5, ZK.D_ZAGRADA) and isinstance(c6, slozena_naredba):
 
+                #print("aj do tu sam dosao")
                 c1.izvedi_svojstva()
 
                 if c1.tip.startswith('const'):
@@ -1827,15 +1828,20 @@ class definicija_funkcije(GS.Cvor):
                 c4.izvedi_svojstva()
 
                 postoji_deklaracija = pomocne.provjeri_egzistenciju(self, c2.ime)
+                tipovi_tuplovi = list(zip(c4.tipovi, c4.imena))
                 if postoji_deklaracija:
                     uvjet2 = pomocne.provjeri_valjanost_argumenata(self, c4.tipovi) and \
                         pomocne.tip_funkcije(self, c1.tip)
-
+                
+                
                 else:
-                    tipovi_tuplovi = list(zip(c4.tipovi, c4.imena))
                     pomocne.dodaj_lokalnu_funkciju(self, c2.ime, c1.tip, True, tipovi_tuplovi)
                     #print(tipovi_tuplovi)
-                    pomocne.dodaj_argumente(c6, tipovi_tuplovi)
+                #print("evo me opet dolaziiiim")
+                #print(tipovi_tuplovi)
+                pomocne.dodaj_argumente(c6, tipovi_tuplovi)
+
+                
 
                 c6.izvedi_svojstva()
                 self.oblik = 'definirana_funkcija'
@@ -2140,8 +2146,11 @@ class izravni_deklarator(GS.Cvor):
                 c1.tip = self.ntip
                 if uvjet:
                     pomocne.izlaz(self)
-
-                pomocne.dodaj_argumente(self, [(c1.tip, c1.ime)])
+                ##TU JE BUG!!!!
+                PK.upisi("    MOVE 0, R1")
+                PK.upisi("    PUSH R1")
+                pomocne.dodaj_lokalnu_varijablu(self, c1.ime, c1.tip, None, None)
+                #pomocne.dodaj_argumente(self, [(c1.tip, c1.ime)])
                 self.oblik = 'var'
                 #provjeri ime bla bla bla
             else:
